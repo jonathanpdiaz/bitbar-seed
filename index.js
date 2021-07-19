@@ -37,6 +37,9 @@ const cleanUpName = name => {
 }
 
 function groupBy(arr, property) {
+
+  arr = arr.filter(issue => issue.errorMessage.indexOf('timed out') < 0);
+
   const reduced = arr.reduce((acc, cur) => {
     acc[cur[property]] = [...acc[cur[property]] || [], cur];
     return acc;
