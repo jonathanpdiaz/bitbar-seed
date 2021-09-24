@@ -60,36 +60,67 @@ function groupBy(arr, property) {
 }
 
 async function getData() {
-  const [dev, stage, prod] = await issues();
+  
+  const apps = JSON.parse(process.env.APPS);
+  const users = JSON.parse(process.env.USERS);
+  const passwords = JSON.parse(process.env.PASSWORDS);
+  
+  let prodTotals = [];
+  let appsMenu = [];
 
-  const devGroup = groupBy(dev.errorGroups, 'lastLambdaName');
-  const stageGroup = groupBy(stage.errorGroups, 'lastLambdaName');
-  const prodGroup = groupBy(prod.errorGroups, 'lastLambdaName');
+  for (let index = 0; index < apps.length; index++) {
+    const app = apps[index];
+    const user = users[index];
+    const password = passwords[index];
 
-  const sumIssues = (total, issues) => total + issues.total;
-  const devTotal = devGroup.reduce(sumIssues, 0);
-  const stageTotal = stageGroup.reduce(sumIssues, 0);
-  const prodTotal = prodGroup.reduce(sumIssues, 0);
+    const [dev, stage, prod] = await issues(app, user, password);
+
+    const devGroup = groupBy(dev.errorGroups, 'lastLambdaName');
+    const stageGroup = groupBy(stage.errorGroups, 'lastLambdaName');
+    const prodGroup = groupBy(prod.errorGroups, 'lastLambdaName');
+
+    const sumIssues = (total, issues) => total + issues.total;
+    const devTotalApp = devGroup.reduce(sumIssues, 0);
+    const stageTotalApp = stageGroup.reduce(sumIssues, 0);
+    const prodTotalApp = prodGroup.reduce(sumIssues, 0);
+    prodTotals.push(prodTotalApp);
+
+    const submenu = [   
+      {
+      text: 'Development'
+      },
+      ...devGroup,
+      bitbar.separator,
+      {
+        text: 'Staging'
+      },
+      ...stageGroup,
+      bitbar.separator,
+      {
+        text: 'Production'
+      },
+      ...prodGroup
+    ];
+  
+    const appMenu =  {
+      text: `${app} - D:${devTotalApp} S:${stageTotalApp} P:${prodTotalApp}`,
+      color: "red"
+    };
+
+    appsMenu.push(appMenu);
+    appsMenu.push(...submenu);
+    appsMenu.push(bitbar.separator);
+  }
+
+  const prodIssues = prodTotals.map(prodTotal => `P:${prodTotal}`);
+  const navText = `🌱 ${prodIssues.join(' - ')}`; 
 
   bitbar([
     {
-      text: `🌱 D:${devTotal} S:${stageTotal} P:${prodTotal}`
+      text: navText
     },
     bitbar.separator,
-    {
-      text: 'Development'
-    },
-    ...devGroup,
-    bitbar.separator,
-    {
-      text: 'Staging'
-    },
-    ...stageGroup,
-    bitbar.separator,
-    {
-      text: 'Production'
-    },
-    ...prodGroup,
+    ...appsMenu,
     bitbar.separator,
     {
       text: "♻︎",

@@ -25,16 +25,12 @@ Amplify.configure({
     },
 });
 
-/**
- * 
- * @param {*} params {url, method}
- * @returns 
- */
-async function issues() {
-    await Auth.signIn(process.env.USER, process.env.PASSWORD);
-    const devP = API.get('issues', `${process.env.APP}/stages/dev/errors?mode=active`);
-    const stgP = API.get('issues', `${process.env.APP}/stages/staging/errors?mode=active`);
-    const prodP = API.get('issues', `${process.env.APP}/stages/prod/errors?mode=active`);
+
+async function issues(app, user, password){
+    await Auth.signIn(user, password);
+    const devP = API.get('issues', `${app}/stages/dev/errors?mode=active`);
+    const stgP = API.get('issues', `${app}/stages/staging/errors?mode=active`);
+    const prodP = API.get('issues', `${app}/stages/prod/errors?mode=active`);
     const issues = Promise.all([devP, stgP, prodP]);
     return issues;
 }
