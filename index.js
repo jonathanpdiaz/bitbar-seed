@@ -36,7 +36,7 @@ const cleanUpName = name => {
     .replace(/\s+/g, '-');
 }
 
-function groupBy(arr, property) {
+function groupBy(app, arr, property) {
 
   arr = arr.filter(issue => issue.errorMessage.indexOf('timed out') < 0);
 
@@ -52,7 +52,7 @@ function groupBy(arr, property) {
       submenu: reduced[lambda].map(issue => {
         return {
           text: `${issue.lastErrorShortId} - ${issue.errorMessage}`,
-          href: `https://console.seed.run/${process.env.APP}/issues/stages/${issue.stageId}/${issue.errorGroupShortId}/${issue.lastErrorShortId}`
+          href: `https://console.seed.run/${app}/issues/stages/${issue.stageId}/${issue.errorGroupShortId}/${issue.lastErrorShortId}`
         }
       })
     };
@@ -75,9 +75,9 @@ async function getData() {
 
     const [dev, stage, prod] = await issues(app, user, password);
 
-    const devGroup = groupBy(dev.errorGroups, 'lastLambdaName');
-    const stageGroup = groupBy(stage.errorGroups, 'lastLambdaName');
-    const prodGroup = groupBy(prod.errorGroups, 'lastLambdaName');
+    const devGroup = groupBy(app, dev.errorGroups, 'lastLambdaName');
+    const stageGroup = groupBy(app, stage.errorGroups, 'lastLambdaName');
+    const prodGroup = groupBy(app, prod.errorGroups, 'lastLambdaName');
 
     const sumIssues = (total, issues) => total + issues.total;
     const devTotalApp = devGroup.reduce(sumIssues, 0);
