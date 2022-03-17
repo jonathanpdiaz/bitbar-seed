@@ -26,12 +26,10 @@ Amplify.configure({
 });
 
 
-async function issues(app, user, password){
+async function issues({ app, envs, user, password }){
     await Auth.signIn(user, password);
-    const devP = API.get('issues', `${app}/stages/dev/errors?mode=active`);
-    const stgP = API.get('issues', `${app}/stages/staging/errors?mode=active`);
-    const prodP = API.get('issues', `${app}/stages/prod/errors?mode=active`);
-    const issues = Promise.all([devP, stgP, prodP]);
+    const promises = envs.map(env => API.get('issues', `${app}/stages/${env}/errors?mode=active`));
+    const issues = Promise.all(promises);
     return issues;
 }
 
