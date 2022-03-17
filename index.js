@@ -60,55 +60,47 @@ function groupBy(app, arr, property) {
 }
 
 async function getData() {
-  
   const apps = JSON.parse(process.env.APPS);
-  const users = JSON.parse(process.env.USERS);
-  const passwords = JSON.parse(process.env.PASSWORDS);
   
-  let prodTotals = [];
+  const sumIssues = (total, issues) => total + issues.total;
+  const isProd = (stageName) => stageName === "prod" || stageName === "production";
+
   let appsMenu = [];
-
-  for (let index = 0; index < apps.length; index++) {
-    const app = apps[index];
-    const user = users[index];
-    const password = passwords[index];
-
-    const [dev, stage, prod] = await issues(app, user, password);
-
-    const devGroup = groupBy(app, dev.errorGroups, 'lastLambdaName');
-    const stageGroup = groupBy(app, stage.errorGroups, 'lastLambdaName');
-    const prodGroup = groupBy(app, prod.errorGroups, 'lastLambdaName');
-
-    const sumIssues = (total, issues) => total + issues.total;
-    const devTotalApp = devGroup.reduce(sumIssues, 0);
-    const stageTotalApp = stageGroup.reduce(sumIssues, 0);
-    const prodTotalApp = prodGroup.reduce(sumIssues, 0);
-    prodTotals.push(prodTotalApp);
-
-    const submenu = [   
-      {
-      text: 'Development'
-      },
-      ...devGroup,
-      bitbar.separator,
-      {
-        text: 'Staging'
-      },
-      ...stageGroup,
-      bitbar.separator,
-      {
-        text: 'Production'
-      },
-      ...prodGroup
-    ];
+  let prodTotals = [];
   
+  for (let index = 0; index < apps.length; index++) {
+    const appItem = apps[index];
+    const { app } = appItem;
+    
+    const issuesPerEnv = await issues(appItem);
+    let subMenu = [];
+    let groupTotals = [];
+
+    for (let j = 0; j < issuesPerEnv.length; j++) {
+      const issues = issuesPerEnv[j];
+      const { stageName, errorGroups } = issues
+      const group = groupBy(app, errorGroups, 'lastLambdaName');
+      const groupTotal = group.reduce(sumIssues, 0);
+      groupTotals.push(`${stageName.charAt(0).toUpperCase()}:${groupTotal}`);
+    
+      if (isProd(stageName)) {
+        prodTotals.push(groupTotal);
+      }
+
+      subMenu.push({ text: stageName });
+      subMenu.push(...group);
+      if (j < issuesPerEnv.length) {
+        subMenu.push(bitbar.separator);
+      }
+    }
+    
     const appMenu =  {
-      text: `${app} - D:${devTotalApp} S:${stageTotalApp} P:${prodTotalApp}`,
+      text: `${app} - ${groupTotals.join(" ")}`,
       color: "red"
     };
 
     appsMenu.push(appMenu);
-    appsMenu.push(...submenu);
+    appsMenu.push(...subMenu);
     appsMenu.push(bitbar.separator);
   }
 
