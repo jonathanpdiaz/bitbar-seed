@@ -22,6 +22,4 @@ https://github.com/matryer/bitbar
    > USER_POOL_ID=
    > USER_POOL_WEB_CLIENT_ID =
    > ENDPOINT =
-   > USER =
-   > PASSWORD =
-   > APP =
+   > APPS = [ { "app": {{app}}, "user": {{user}}, "password": {{password}}, "envs":[ "dev", "staging", "prod", {{env}} ] }, ..., {} ]
