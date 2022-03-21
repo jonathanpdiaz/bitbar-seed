@@ -1,25 +1,7 @@
 #!/usr/bin/env /usr/local/bin/node
-const { execSync } = require("child_process");
 const bitbar = require('bitbar');
-const dotenv = require("dotenv");
 const fs = require('fs');
-
-const ENV_FILE_NAME = ".env.bitbar-seed";
-let envFile;
-if (fs.existsSync(`./${ENV_FILE_NAME}`)) {
-  envFile = fs.readFileSync(`./${ENV_FILE_NAME}`);
-} else {
-  const response = execSync(
-    "defaults read com.matryer.BitBar pluginsDirectory"
-  );
-  const envPath = `${response.toString().trim()}/${ENV_FILE_NAME}`;
-  envFile = fs.readFileSync(envPath);
-}
-
-const envConfig = dotenv.parse(envFile);
-for (let k in envConfig) {
-  process.env[k] = envConfig[k];
-}
+const settings = require('./.env.json')
 
 const { issues } = require("./auth");
 
@@ -60,18 +42,18 @@ function groupBy(app, arr, property) {
 }
 
 async function getData() {
-  const apps = JSON.parse(process.env.APPS);
-  
+  const { cognito, apps } = settings;
+
   const sumIssues = (total, issues) => total + issues.total;
   const isProd = (stageName) => stageName === "prod" || stageName === "production";
 
   let appsMenu = [];
   let prodTotals = [];
-  
+
   for (let index = 0; index < apps.length; index++) {
     const appItem = apps[index];
     const { app } = appItem;
-    
+
     const issuesPerEnv = await issues(appItem);
     let subMenu = [];
     let groupTotals = [];
@@ -82,7 +64,7 @@ async function getData() {
       const group = groupBy(app, errorGroups, 'lastLambdaName');
       const groupTotal = group.reduce(sumIssues, 0);
       groupTotals.push(`${stageName.charAt(0).toUpperCase()}:${groupTotal}`);
-    
+
       if (isProd(stageName)) {
         prodTotals.push(groupTotal);
       }
@@ -93,8 +75,8 @@ async function getData() {
         subMenu.push(bitbar.separator);
       }
     }
-    
-    const appMenu =  {
+
+    const appMenu = {
       text: `${app} - ${groupTotals.join(" ")}`,
       color: "red"
     };
@@ -105,7 +87,7 @@ async function getData() {
   }
 
   const prodIssues = prodTotals.map(prodTotal => `P:${prodTotal}`);
-  const navText = `🌱 ${prodIssues.join(' - ')}`; 
+  const navText = `🌱 ${prodIssues.join(' - ')}`;
 
   bitbar([
     {
