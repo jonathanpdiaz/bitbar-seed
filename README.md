@@ -15,11 +15,26 @@ https://github.com/matryer/bitbar
    - Alternatively, to change the execution frequency, use: `ln -s /Users/bitbar-seed/bitbar-seed.5m.js bitbar-seed.10m.js`
 3. Define an enviroment file named `env.bitbar-seed` on your plugin folder.
    
-   > Required fields:
-   >```
-   > REGION =
-   > IDENTITY_POOL_ID =
-   > USER_POOL_ID=
-   > USER_POOL_WEB_CLIENT_ID =
-   > ENDPOINT =
-   > APPS = [ { "app": {{app}}, "user": {{user}}, "password": {{password}}, "envs":[ "dev", "staging", "prod", {{env}} ] }, ..., {} ]
+> Required fields:
+```   
+   { 
+      "cognito": {
+            "identityPoolId": "us-east-1:7750a6bc-adb7-480d-9d5b-1a0ff55b8001",
+            "region": "us-east-1",
+            "userPoolId": "us-east-1_44AK9Jk0I",
+            "userPoolWebCliendId": "l1t7f7la2lh57m8e40v9gb5ts",
+            "endpoint": "https://y70m3ridv5.execute-api.us-east-1.amazonaws.com/prod/"
+         },
+      "apps": [
+         {
+               "app": "your-app",
+               "envs": [
+                  "your",
+                  "stages",
+                  "here"
+               ],
+               "user": "user",
+               "password": "password"
+         },...
+      ]
+   }

@@ -1,0 +1,21 @@
+{
+    "cognito": {
+        "identityPoolId": "identityPoolId",
+        "region": "region",
+        "userPoolId": "userPoolId",
+        "userPoolWebCliendId": "userPoolWebCliendId",
+        "endpoint": "endpoint"
+    },
+    "apps": [
+        {
+            "app": "your-app",
+            "envs": [
+                "your",
+                "stages",
+                "here"
+            ],
+            "user": "user",
+            "password": "password"
+        }
+    ]
+}
