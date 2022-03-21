@@ -13,7 +13,7 @@ https://github.com/matryer/bitbar
    - `cd /Users/bitbar-plugins`
    - `ln -s /Users/bitbar-seed/index.js bitbar-seed.5m.js`
    - Alternatively, to change the execution frequency, use: `ln -s /Users/bitbar-seed/bitbar-seed.5m.js bitbar-seed.10m.js`
-3. Define an enviroment file named `env.bitbar-seed` on your plugin folder.
+3. Define an enviroment file named `env.bitbar-seed.json` on your plugin folder.
    
 > Required fields:
 ```   

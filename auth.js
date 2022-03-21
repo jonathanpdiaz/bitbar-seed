@@ -1,7 +1,7 @@
 const Amplify = require('aws-amplify').default;
 const { Signer } = require('aws-amplify');
 const { Auth, API } = Amplify;
-const { cognito } = require('./.env.json')
+const { cognito } = require('./env.bitbar-seed.json')
 
 Amplify.configure({
     Auth: {

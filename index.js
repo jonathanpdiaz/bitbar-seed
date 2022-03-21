@@ -1,7 +1,7 @@
 #!/usr/bin/env /usr/local/bin/node
 const bitbar = require('bitbar');
 const fs = require('fs');
-const settings = require('./.env.json')
+const settings = require('./env.bitbar-seed.json')
 
 const { issues } = require("./auth");
 
