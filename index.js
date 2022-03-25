@@ -42,7 +42,7 @@ function groupBy(app, arr, property) {
 }
 
 async function getData() {
-  const { cognito, apps } = settings;
+  const { apps } = settings;
 
   const sumIssues = (total, issues) => total + issues.total;
   const isProd = (stageName) => stageName === "prod" || stageName === "production";
@@ -84,6 +84,7 @@ async function getData() {
     appsMenu.push(appMenu);
     appsMenu.push(...subMenu);
     appsMenu.push(bitbar.separator);
+    setTimeout(() => { }, 1000);
   }
 
   const prodIssues = prodTotals.map(prodTotal => `P:${prodTotal}`);
