@@ -20,7 +20,9 @@ const cleanUpName = name => {
 
 function groupBy(app, arr, property) {
 
-  arr = arr.filter(issue => issue.errorMessage.indexOf('timed out') < 0);
+  arr = arr.filter(issue => {
+    return issue.errorMessage.indexOf('timed out') < 0 && !issue.errorMessage.includes('error: Failed to send datapoint: 429 Too Many Requests')
+  });
 
   const reduced = arr.reduce((acc, cur) => {
     acc[cur[property]] = [...acc[cur[property]] || [], cur];
