@@ -56,36 +56,55 @@ async function getData() {
     const appItem = apps[index];
     const { app } = appItem;
 
-    const issuesPerEnv = await issues(appItem);
-    let subMenu = [];
-    let groupTotals = [];
-
-    for (let j = 0; j < issuesPerEnv.length; j++) {
-      const issues = issuesPerEnv[j];
-      const { stageName, errorGroups } = issues
-      const group = groupBy(app, errorGroups, 'lastLambdaName');
-      const groupTotal = group.reduce(sumIssues, 0);
-      groupTotals.push(`${stageName.charAt(0).toUpperCase()}:${groupTotal}`);
-
-      if (isProd(stageName)) {
-        prodTotals.push(groupTotal);
-      }
-
-      subMenu.push({ text: stageName });
-      subMenu.push(...group);
-      if (j < issuesPerEnv.length) {
-        subMenu.push(bitbar.separator);
-      }
+    let issuesPerEnv;
+    let error;
+    try {
+      issuesPerEnv = await issues(appItem);
+    } catch (e) {
+      error = e;
     }
 
-    const appMenu = {
-      text: `${app} - ${groupTotals.join(" ")}`,
-      color: "red"
-    };
+    if (issuesPerEnv) {
+      let subMenu = [];
+      let groupTotals = [];
 
-    appsMenu.push(appMenu);
-    appsMenu.push(...subMenu);
-    appsMenu.push(bitbar.separator);
+      for (let j = 0; j < issuesPerEnv.length; j++) {
+        const issues = issuesPerEnv[j];
+        const { stageName, errorGroups } = issues
+        const group = groupBy(app, errorGroups, 'lastLambdaName');
+        const groupTotal = group.reduce(sumIssues, 0);
+        groupTotals.push(`${stageName.charAt(0).toUpperCase()}:${groupTotal}`);
+
+        if (isProd(stageName)) {
+          prodTotals.push(groupTotal);
+        }
+
+        subMenu.push({ text: stageName });
+        subMenu.push(...group);
+        if (j < issuesPerEnv.length) {
+          subMenu.push(bitbar.separator);
+        }
+      }
+
+      const appMenu = {
+        text: `${app} - ${groupTotals.join(" ")}`,
+        color: "red"
+      };
+
+      appsMenu.push(appMenu);
+      appsMenu.push(...subMenu);
+      appsMenu.push(bitbar.separator);
+    } else {
+      const appMenu = {
+        text: `${app} - Error`,
+        color: "red"
+      };
+
+      appsMenu.push(appMenu);
+      appsMenu.push(error.response.data.code);
+      appsMenu.push(bitbar.separator);
+    }
+
     setTimeout(() => { }, 1000);
   }
 
