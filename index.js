@@ -31,11 +31,11 @@ function groupBy(app, arr, property) {
 
   return Object.keys(reduced).map(lambda => {
     return {
-      text: `${reduced[lambda].length} - ${cleanUpName(lambda)}`,
+      text: `${reduced[lambda].length} - ${cleanUpName(lambda)}` || "",
       total: reduced[lambda].length,
       submenu: reduced[lambda].map(issue => {
         return {
-          text: `${issue.lastErrorShortId} - ${issue.errorMessage}`,
+          text: `${issue.lastErrorShortId} - ${issue.errorMessage}` || "",
           href: `https://console.seed.run/${app}/issues/stages/${issue.stageId}/${issue.errorGroupShortId}/${issue.lastErrorShortId}`
         }
       })
